@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 import requests
 import csv
 from datetime import datetime, timedelta
+import os
 
 app = FastAPI()
 
@@ -12,7 +13,8 @@ lon = -6.2603  # Longitude of Dublin
 
 @app.post("/weather/")
 async def fetch_and_store_weather():
-    csv_filename = "dublin_historical_weather2.csv"
+    os.makedirs('data', exist_ok=True)
+    csv_filename = "data/dublin_historical_weather2.csv"
     fields = ['Time', 'Temperature', 'Humidity', 'Weather Description', 'Pressure', 'Wind Speed', 'Wind Direction', 'Cloudiness']
 
     # Initialize the CSV file and write field names
