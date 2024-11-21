@@ -1,10 +1,15 @@
+import logging
+from datetime import datetime, timedelta
 import requests
 import csv
-from datetime import datetime, timedelta
 import os
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-# Function to fetch and store weather data
+
 def fetch_and_store_weather(API_KEY, lat, lon):
     os.makedirs("data", exist_ok=True)
     csv_filename = "data/dublin_historical_weather2.csv"
@@ -19,24 +24,19 @@ def fetch_and_store_weather(API_KEY, lat, lon):
         "Cloudiness",
     ]
 
-    # Initialize the CSV file and write field names
     with open(csv_filename, mode="w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(fields)
 
-    data_count = 0  # Initialize data counter
-    days_back = 0  # Start from one day ago
-    max_days_back = 365  # Set a maximum look-back period, such as one year
+    data_count = 0
+    days_back = 0
+    max_days_back = 365
 
-    # Loop through requests until at least 1000 rows of data are collected
     while data_count < 1000 and days_back < max_days_back:
         end = int((datetime.now() - timedelta(days=days_back)).timestamp())
         start = int((datetime.now() - timedelta(days=days_back + 1)).timestamp())
-
-        # Construct the API request URL
         url = f"https://history.openweathermap.org/data/2.5/history/city?lat={lat}&lon={lon}&type=hour&start={start}&end={end}&appid={API_KEY}"
 
-        # Make the request
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
@@ -44,7 +44,6 @@ def fetch_and_store_weather(API_KEY, lat, lon):
                 with open(csv_filename, mode="a", newline="") as file:
                     writer = csv.writer(file)
                     for item in data["list"]:
-                        # Extract all relevant weather data
                         time = datetime.fromtimestamp(item["dt"]).strftime(
                             "%Y-%m-%d %H:%M:%S"
                         )
@@ -57,7 +56,6 @@ def fetch_and_store_weather(API_KEY, lat, lon):
                         description = (
                             item["weather"][0]["description"] if item["weather"] else ""
                         )
-                        # Write to the CSV file
                         writer.writerow(
                             [
                                 time,
@@ -73,11 +71,19 @@ def fetch_and_store_weather(API_KEY, lat, lon):
                         data_count += 1
                         if data_count >= 1000:
                             break
+                logging.info(
+                    f"Added data for {datetime.fromtimestamp(end).strftime('%Y-%m-%d')}, total entries: {data_count}"
+                )
             else:
-                print(f"No data for {datetime.fromtimestamp(end).strftime('%Y-%m-%d')}")
+                logging.info(
+                    f"No data for {datetime.fromtimestamp(end).strftime('%Y-%m-%d')}"
+                )
         else:
+            logging.error(
+                f"Failed to retrieve data for {datetime.fromtimestamp(end).strftime('%Y-%m-%d')}: {response.status_code}"
+            )
             raise Exception("Failed to fetch data from the API")
 
-        days_back += 1  # Move the window back one day
+        days_back += 1
 
     return {"status": "Data retrieval complete", "total_entries": data_count}
