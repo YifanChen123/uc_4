@@ -19,6 +19,8 @@ def fetch_and_store_weather(API_KEY, lat, lon):
 
         # 清空表中数据以保持只有最新数据
         session.execute(text("DELETE FROM weather"))
+        # id序列编号从1开始
+        session.execute(text("ALTER SEQUENCE weather_id_seq RESTART WITH 1"))
         session.commit()  # 确保删除操作在添加新数据前完成
 
         data_count = 0
