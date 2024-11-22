@@ -6,9 +6,17 @@
 
 FastAPI
 
+[documentation](https://fastapi.tiangolo.com/learn/) in English
+
+[documentation](https://fastapi.tiangolo.com/zh/learn/) in Chinese
+
 ### Frontend
 
 ### DataBase
+
+PostgreSQL
+
+[How to Create and Connect PostgreSQL with Amazon RDS | S3 CloudHub](https://www.youtube.com/watch?v=0A-5ITILrMA)
 
 ## Commands
 
