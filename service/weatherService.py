@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime, timedelta
 import requests
-from sqlmodel import Session, text
+from sqlmodel import Session, text, select
 from model import Weather, create_db_and_tables, engine
 from sqlalchemy.inspection import inspect
+from sqlalchemy.exc import NoResultFound
 
 # Configure logging
 logging.basicConfig(
@@ -72,3 +73,19 @@ def fetch_and_store_weather(API_KEY, lat, lon):
             days_back += 1
 
         return {"status": "Data retrieval complete", "total_entries": data_count}
+
+
+def get_weather_data(page, per_page):
+    with Session(engine) as session:
+        if not inspect(engine).has_table("weather"):
+            raise Exception("Weather table does not exist.")
+
+        offset = (page - 1) * per_page
+        statement = (
+            select(Weather).order_by(Weather.time.desc()).offset(offset).limit(per_page)
+        )
+        results = session.exec(statement).all()
+        if not results:
+            raise NoResultFound("No weather data available on this page.")
+
+        return results
