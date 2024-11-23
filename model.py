@@ -52,6 +52,23 @@ class Light(SQLModel, table=True):
     light_on: datetime
 
 
+# Define SQLModel class for Process
+class Process(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    time: datetime  # 来自Weather表
+    date: datetime  # 来自Sun表
+    sunrise: datetime
+    sunset: datetime
+    temperature: float
+    humidity: int
+    description: Optional[str]
+    pressure: int
+    wind_speed: float
+    wind_direction: int
+    cloudiness: int
+    light: bool  # 灯光开关状态
+
+
 # Function to create weather table
 def create_weather_table():
     if not inspect(engine).has_table("weather"):
@@ -67,4 +84,9 @@ def create_sun_table():
 # Function to create light table
 def create_light_table():
     if not inspect(engine).has_table("light"):
+        SQLModel.metadata.create_all(engine)
+
+
+def create_process_table():
+    if not inspect(engine).has_table("process"):
         SQLModel.metadata.create_all(engine)

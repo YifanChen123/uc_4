@@ -6,8 +6,19 @@ from service.weatherService import get_weather_data
 from service.sunService import fetch_and_store_sun_data, get_sun_data
 from datetime import datetime
 from service.lightService import store_light_data, retrieve_light_data
+from service.processService import fetch_process_data, get_process_data
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# 添加 CORS 配置
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 允许所有来源
+    allow_credentials=True,  # 允许发送 cookies
+    allow_methods=["*"],  # 允许所有 HTTP 方法
+    allow_headers=["*"],  # 允许所有 HTTP 头
+)
 
 # Load environment variables
 load_dotenv()
@@ -82,5 +93,25 @@ async def get_light(
         if not light_data:
             raise HTTPException(status_code=404, detail="No light data found.")
         return light_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/process/")
+async def create_process():
+    try:
+        fetch_process_data()
+        return {"message": "Process data stored successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/process/")
+async def read_process(
+    page: int = Query(default=1, ge=1), per_page: int = Query(default=10, ge=1)
+):
+    try:
+        process_data = get_process_data(page, per_page)
+        return process_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
