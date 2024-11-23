@@ -12,6 +12,8 @@ FastAPI
 
 ### Frontend
 
+React
+
 ### DataBase
 
 PostgreSQL
