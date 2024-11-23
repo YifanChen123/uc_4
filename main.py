@@ -7,18 +7,8 @@ from service.sunService import fetch_and_store_sun_data, get_sun_data
 from datetime import datetime
 from service.lightService import store_light_data, retrieve_light_data
 from service.processService import fetch_process_data, get_process_data
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
-# 添加 CORS 配置
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 允许所有来源
-    allow_credentials=True,  # 允许发送 cookies
-    allow_methods=["*"],  # 允许所有 HTTP 方法
-    allow_headers=["*"],  # 允许所有 HTTP 头
-)
 
 # Load environment variables
 load_dotenv()
