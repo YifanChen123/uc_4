@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 import requests
 from sqlmodel import Session, text, select
-from model import Weather, create_db_and_tables, engine
+from model import Weather, create_weather_table, engine
 from sqlalchemy.inspection import inspect
 from sqlalchemy.exc import NoResultFound
 
@@ -16,7 +16,7 @@ def fetch_and_store_weather(API_KEY, lat, lon):
     with Session(engine) as session:
         # 查询是否需要创建表
         if not inspect(engine).has_table("weather"):  # 使用inspect方法检查表是否存在
-            create_db_and_tables()
+            create_weather_table()
 
         # 清空表中数据以保持只有最新数据
         session.execute(text("DELETE FROM weather"))
@@ -28,7 +28,7 @@ def fetch_and_store_weather(API_KEY, lat, lon):
         days_back = 0
         max_days_back = 365
 
-        while data_count < 1000 and days_back < max_days_back:
+        while data_count < 4000 and days_back < max_days_back:
             end = int((datetime.now() - timedelta(days=days_back)).timestamp())
             start = int((datetime.now() - timedelta(days=days_back + 1)).timestamp())
             url = f"https://history.openweathermap.org/data/2.5/history/city?lat={lat}&lon={lon}&type=hour&start={start}&end={end}&appid={API_KEY}"
@@ -54,7 +54,7 @@ def fetch_and_store_weather(API_KEY, lat, lon):
                         )
                         session.add(weather)
                         data_count += 1
-                        if data_count >= 1000:
+                        if data_count >= 4000:
                             break
                     session.commit()
                     logging.info(

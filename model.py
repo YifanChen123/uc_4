@@ -19,6 +19,9 @@ POSTGRES_DB = os.getenv("POSTGRES_DB")
 # Construct DATABASE_URL from environment variables
 DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
+# Create database engine
+engine = create_engine(DATABASE_URL)
+
 
 # Define SQLModel class
 class Weather(SQLModel, table=True):
@@ -33,12 +36,21 @@ class Weather(SQLModel, table=True):
     cloudiness: int
 
 
-# Create database engine
-engine = create_engine(DATABASE_URL)
+# Define SQLModel class for Sun
+class Sun(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    date: str
+    sunrise: str
+    sunset: str
 
 
-# Function to create tables
-def create_db_and_tables():
-    global engine
+# Function to create weather table
+def create_weather_table():
     if not inspect(engine).has_table("weather"):
+        SQLModel.metadata.create_all(engine)
+
+
+# Function to create sun table
+def create_sun_table():
+    if not inspect(engine).has_table("sun"):
         SQLModel.metadata.create_all(engine)
