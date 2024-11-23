@@ -44,6 +44,14 @@ class Sun(SQLModel, table=True):
     sunset: str
 
 
+# Define SQLModel class for Light
+class Light(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: str
+    light_off: datetime
+    light_on: datetime
+
+
 # Function to create weather table
 def create_weather_table():
     if not inspect(engine).has_table("weather"):
@@ -53,4 +61,10 @@ def create_weather_table():
 # Function to create sun table
 def create_sun_table():
     if not inspect(engine).has_table("sun"):
+        SQLModel.metadata.create_all(engine)
+
+
+# Function to create light table
+def create_light_table():
+    if not inspect(engine).has_table("light"):
         SQLModel.metadata.create_all(engine)

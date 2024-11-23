@@ -5,6 +5,7 @@ from service.weatherService import fetch_and_store_weather  # 导入刚创建的
 from service.weatherService import get_weather_data
 from service.sunService import fetch_and_store_sun_data, get_sun_data
 from datetime import datetime
+from service.lightService import store_light_data, retrieve_light_data
 
 app = FastAPI()
 
@@ -59,5 +60,27 @@ async def retrieve_sun_data(
         if not sun_data:
             raise HTTPException(status_code=404, detail="No sun data found.")
         return sun_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/light/")
+async def store_light():
+    try:
+        store_light_data()
+        return {"message": "Light data stored successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/light/")
+async def get_light(
+    page: int = Query(default=1, ge=1), per_page: int = Query(default=10, ge=1)
+):
+    try:
+        light_data = retrieve_light_data(page, per_page)
+        if not light_data:
+            raise HTTPException(status_code=404, detail="No light data found.")
+        return light_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
