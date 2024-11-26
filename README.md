@@ -27,3 +27,7 @@ PostgreSQL
 3. Activate the virtual environment: `source .venv/bin/activate`
 4. Install packages: `pip3 install -r requirements.txt`
 5. Run the project: `uvicorn main:app --reload`
+
+## Deploy
+
+[How to Deploy FastAPI on AWS EC2: Quick and Easy Steps!](https://www.youtube.com/watch?v=SgSnz7kW-Ko)
